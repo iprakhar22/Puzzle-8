@@ -1,9 +1,12 @@
-/* Compile using :
+/* Made by Prakhar Vaish 16803025 
+
+Compile using :
 g++ main.cpp -o main.out -std=c++11 -framework GLUT -framework OpenGL -Wno-deprecated-declarations
 */
 
 #include "gameheaders.h"
 #include "game.cpp"
+#include "ai.cpp"
 
 #define COLUMNS 80
 #define ROWS 80
@@ -20,7 +23,8 @@ void dipsplay_callback()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	drawGrid(grid);
-	printString(5,5,"Press A to be Awesome",{0,0,0});
+	printString(5,5,"Press S to Solve",{0,0,0});
+	printString(55,5,"Press R to Randomize",{0,0,0});
 	//printBigString(5,5,"Press A to be awesome",{0,0,0});
 	printString(35,75,"Puzzle 8",{0,0,0});
 	glutSwapBuffers();
@@ -61,9 +65,15 @@ void keyboard_callback(int key, int, int)
 			moveRight();
 			break;
 
-		case 'a':
-		case 'A':
-			std::cout<<"HAHA NOT SO EASY MATE\n";
+		case 's':
+		case 'S':
+			solve();
+			break;
+
+		case 'R':
+		case 'r':
+			srand(time(NULL));
+			reset();
 			break;
 	}
 }
