@@ -21,7 +21,7 @@ void printBigString(int x, int y, string s, RGB color, int z=0)
 	glTranslatef(x, y+8,z);
 	glScalef(0.09f,0.08f,z);
 
-	for (int i = 0; i<s.length(); ++i)
+	for(int i=0;i<s.length();++i)
 		glutStrokeCharacter(GLUT_STROKE_ROMAN , s[i]);
 	glPopMatrix();
 }
@@ -98,13 +98,19 @@ void moveRight()
 	}
 }
 
-bool isSolvable(int seed[])
+bool isSolvable(int seed[3][3])
 {
 	int inv_count = 0;
-	for (int i = 0; i < 9 - 1; i++)
+	/*for (int i = 0; i < 9 - 1; i++)
 		for (int j = i+1; j < 9; j++)
 			 if (seed[j] && seed[i] &&  seed[i] > seed[j])
-				  inv_count++;
+				  inv_count++;*/
+	for(int i=0;i<3;++i)
+		for(int j=0;j<3;++j){
+			if(seed[i][j]!=goal[i][j])
+				inv_count++;
+			//trace(seed[i][j],goal[i][j],inv_count);
+		}
 
 	// return true if inversion count is even.
 	return (inv_count%2 == 0);
@@ -112,32 +118,37 @@ bool isSolvable(int seed[])
 
 void reset()
 {
-	int i,j;
-	int seed[]={1,2,3,4,5,6,7,8,0};
+	int i,j,k,l,m;
+	int sseed[]={1,2,3,4,5,6,7,8,0}, seed[3][3];
 
+	// Randomly swap positions
 	for(i=0;i<9;++i)
-		swap(seed[i],seed[rand()%9]);
+		swap(sseed[i],sseed[rand()%9]);
 
-	/*for(i=0;i<9;++i)
-		cerr<<seed[i]<<" ";
-	cerr<<"\n\n";*/
+	for(k=0,i=0;i<3;++i)
+	{
+		for(j=0;j<3;++j,++k)
+		{
+			seed[i][j] = sseed[k];
+		}
+	}
 
 	if(isSolvable(seed))
 	{
-		int k = 0;
-		for(j=2;j>=0;--j)
+		k = 0;
+		for(i=0;i<3;++i)
 		{
-			for(i=0;i<3;++i)
+			for(j=0;j<3;++j)
 			{
 				//cout<<"i: "<<i<<" | j: "<<j<<" | grid[i][j]: "<<grid[i][j]<<" | seed[k]: "<<seed[k]<<"\n";
 				//cout<<"hole[0]: "<<hole[0]<<" | hole[1]: "<<hole[1]<<"\n\n";
-				if(seed[k] == 0)
+				if(seed[i][j] == 0)
 				{
 					hole[0] = i;
 					hole[1] = j;
 				}
 
-				swap( grid[i][j] , seed[k] );
+				grid[i][j] = seed[i][j];
 				k++;
 			}
 		}

@@ -10,12 +10,26 @@ g++ main.cpp -o main.out -std=c++11 -framework GLUT -framework OpenGL -Wno-depre
 
 #define COLUMNS 80
 #define ROWS 80
-#define FPS 10
+#define FPS 3
 
 
 void init()
 {
 	glClearColor(0.9,0.9,0.9,1.0);
+}
+
+void timer_callback(int)
+{
+	if(iii==3)
+		printflag = false;
+	if(printflag) 
+	{
+		printt();
+		cout<<"yes\n";
+		iii++;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(1000/FPS,timer_callback,0);
 }
 
 // This function is called at every frame of glutMainLoop
@@ -27,6 +41,7 @@ void dipsplay_callback()
 	printString(55,5,"Press R to Randomize",{0,0,0});
 	//printBigString(5,5,"Press A to be awesome",{0,0,0});
 	printString(35,75,"Puzzle 8",{0,0,0});
+	//trace(iii);
 	glutSwapBuffers();
 }
 
@@ -37,12 +52,6 @@ void reshape_callback(int w, int h)
 	glLoadIdentity();
 	glOrtho(0,COLUMNS,0,ROWS,-1.0,1.0);
 	glMatrixMode(GL_MODELVIEW);
-}
-
-void timer_callback(int)
-{
-	glutPostRedisplay();
-	glutTimerFunc(1000/FPS,timer_callback,0);
 }
 
 void keyboard_callback(int key, int, int)
@@ -74,6 +83,11 @@ void keyboard_callback(int key, int, int)
 		case 'r':
 			srand(time(NULL));
 			reset();
+			break;
+
+		case 'p':
+			iii=0;
+			printflag = true;
 			break;
 	}
 }

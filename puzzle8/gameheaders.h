@@ -17,13 +17,31 @@
 #include <unistd.h>
 using namespace std;
 
+// Set this to 0 to use Manhattan distance. 1 to use Hamming distance.
+#define ManORHam 1
+
+#define pb push_back
+
+#define TRACE
+#ifdef TRACE
+#define trace(...) __f(#__VA_ARGS__, __VA_ARGS__)
+template <typename Arg1>
+void __f(const char* name, Arg1&& arg1) { cerr << name << " : " << arg1 << std::endl; }
+template <typename Arg1, typename... Args>
+void __f(const char* names, Arg1&& arg1, Args&&... args) { const char* comma = strchr(names + 1, ',');cerr.write(names, comma - names) << " : " << arg1<<" | ";__f(comma+1, args...); }
+#else
+#define trace(...)
+#endif
+
+#define traceloop(x,a) { cerr<<#a<<": "; for(ll i=0;i<x;i++) cerr<<a[i]<<" "; cerr<<endl; }
+
 
 struct RGB
 {
 	float r,g,b;
 };
 
-int grid[3][3]=
+int grid[3][3] =
 {
 	{7,4,1},
 	{8,5,2}, 
@@ -39,10 +57,16 @@ DISPLAYED IN THE FORM :
    i > > >		  j
 */
 
+int goal[3][3] =
+{
+	{7,4,1},
+	{8,5,2}, 
+	{0,6,3}
+};
+
 int hole[2] = { 2, 0 }; 
 // hole[0] = row
 // hole[1] = column
-
 
 
 
@@ -58,5 +82,6 @@ map <int,RGB> colormap =
 	{2, {0.6, 0.5, 1.0} },
 	{8, {1.0, 0.7, 0.2} } 
 } ;
+
 
 #endif
