@@ -15,7 +15,7 @@ Linux :
 ~~~~ 
 g++ main.cpp -o main.out -std=c++11 -lGL -lGLU -lglut -Wno-deprecated-declarations
 ~~~~
-Linux :
+Windows :
 ~~~~ 
 g++ main.cpp -o main.out -std=c++11 -lglut32 -lglu32 -lopengl32 -Wno-deprecated-declarations
 ~~~~
