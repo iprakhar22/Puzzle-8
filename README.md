@@ -5,6 +5,8 @@ The AI of the program is built using the A* algorithm which used Priority Queues
 
 Some states may take few seconds(maybe even upto 1-2 minutes) so be patient. The algorithm is theorhetically exponential in time complexity asymptotics but works well for 3x3 grid in under 2 minutes.
 
+Use arrow keys to play the game, R to randomize the grid and S to solve it from that instance.
+
 **To compile :**
 
 macOS :
