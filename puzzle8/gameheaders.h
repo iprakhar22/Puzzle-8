@@ -17,9 +17,6 @@
 #include <unistd.h>
 using namespace std;
 
-// Set this to 0 to use Manhattan distance. 1 to use Hamming distance.
-#define ManORHam 1
-
 #define pb push_back
 
 #define TRACE
@@ -34,6 +31,23 @@ void __f(const char* names, Arg1&& arg1, Args&&... args) { const char* comma = s
 #endif
 
 #define traceloop(x,a) { cerr<<#a<<": "; for(ll i=0;i<x;i++) cerr<<a[i]<<" "; cerr<<endl; }
+
+// Set this to 0 to use Manhattan distance. 1 to use Hamming distance.
+#define ManORHam 1
+
+// Structure definition of a game state aka seed
+struct seed 
+{
+	int mat[3][3];
+	int cost;
+	int moves;
+	int seedhole[2];
+	seed* parent;
+};
+
+seed* final;
+stack<seed*> finalsequence;
+bool printflag = false;
 
 
 struct RGB

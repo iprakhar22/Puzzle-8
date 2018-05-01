@@ -20,14 +20,14 @@ void init()
 
 void timer_callback(int)
 {
-	if(iii==3)
+	if(finalsequence.empty())
 		printflag = false;
-	if(printflag) 
+	if(printflag)
 	{
-		printt();
-		cout<<"yes\n";
-		iii++;
+		printGrid();
+		finalsequence.pop();
 	}
+
 	glutPostRedisplay();
 	glutTimerFunc(1000/FPS,timer_callback,0);
 }
@@ -39,9 +39,8 @@ void dipsplay_callback()
 	drawGrid(grid);
 	printString(5,5,"Press S to Solve",{0,0,0});
 	printString(55,5,"Press R to Randomize",{0,0,0});
-	//printBigString(5,5,"Press A to be awesome",{0,0,0});
+	//printBigString(5,5,"Press A",{0,0,0});
 	printString(35,75,"Puzzle 8",{0,0,0});
-	//trace(iii);
 	glutSwapBuffers();
 }
 
@@ -76,18 +75,13 @@ void keyboard_callback(int key, int, int)
 
 		case 's':
 		case 'S':
-			solve();
+			AStar();
 			break;
 
 		case 'R':
 		case 'r':
 			srand(time(NULL));
 			reset();
-			break;
-
-		case 'p':
-			iii=0;
-			printflag = true;
 			break;
 	}
 }

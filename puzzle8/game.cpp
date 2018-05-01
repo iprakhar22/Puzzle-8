@@ -98,22 +98,16 @@ void moveRight()
 	}
 }
 
-bool isSolvable(int seed[3][3])
+bool isSolvable(int seed[])
 {
-	int inv_count = 0;
-	/*for (int i = 0; i < 9 - 1; i++)
-		for (int j = i+1; j < 9; j++)
-			 if (seed[j] && seed[i] &&  seed[i] > seed[j])
-				  inv_count++;*/
-	for(int i=0;i<3;++i)
-		for(int j=0;j<3;++j){
-			if(seed[i][j]!=goal[i][j])
-				inv_count++;
-			//trace(seed[i][j],goal[i][j],inv_count);
-		}
+	int inversions = 0;
+	for(int i=0;i<9-1;++i)
+		for(int j=i+1;j<9;++j)
+			if(seed[i] && seed[j] && seed[i] > seed[j])
+				inversions++;
 
 	// return true if inversion count is even.
-	return (inv_count%2 == 0);
+	return (inversions%2 == 0);
 }
 
 void reset()
@@ -133,15 +127,13 @@ void reset()
 		}
 	}
 
-	if(isSolvable(seed))
+	if(isSolvable(sseed))
 	{
 		k = 0;
 		for(i=0;i<3;++i)
 		{
 			for(j=0;j<3;++j)
 			{
-				//cout<<"i: "<<i<<" | j: "<<j<<" | grid[i][j]: "<<grid[i][j]<<" | seed[k]: "<<seed[k]<<"\n";
-				//cout<<"hole[0]: "<<hole[0]<<" | hole[1]: "<<hole[1]<<"\n\n";
 				if(seed[i][j] == 0)
 				{
 					hole[0] = i;
@@ -156,3 +148,25 @@ void reset()
 	else
 		reset();
 }
+
+void printGrid()
+{
+	int i, j;
+	seed* curr = finalsequence.top();
+	for(i=0;i<3;++i)
+		for(j=0;j<3;++j)
+			grid[i][j] = curr->mat[i][j];
+}
+
+void pushGrids(seed* node)
+{
+	finalsequence.push(node);
+
+	if(node->parent)
+		pushGrids(node->parent);
+	else
+		printGrid();
+	return ;
+}
+
+

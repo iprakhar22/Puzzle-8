@@ -1,36 +1,22 @@
 /* Do the good stuff, Mr.Computer */
 
-// Structure definition of a game state aka seed
-struct seed 
-{
-	int mat[3][3];
-	int cost;
-	int moves;
-	int seedhole[2];
-};
-
 /*
-   * Implementation of a priority-queue using min binary heap and cost function used is hamming/mahattan distance.
+   * Implementation of a priority-queue using min binary heap and the cost function
+   * used is hamming/mahattan distance.
    * PQ calling functions are made public while the heap inner functions are inaccessable.
 */
 class PriorityQueue
 {
 private:
 	// Min Heap array implementation
-	vector<seed> heap;
+	vector<seed*> heap;
 
 public:
 	// Initialize the heap with the current seed
 	PriorityQueue()
 	{
-		//totalmoves = 0;
-
 		int d = (!ManORHam)? manhattan(grid) : hamming(grid) ;
-
-		heap.pb( newNode(grid, 0, hole) );
-
-		maxsize = 1;
-
+		maxsize = 0;
 	}
 
 	// De-allocate memory of all the used components
@@ -71,7 +57,7 @@ private:
 		
 		for(i=0;i<3;++i)
 			for(j=0;j<3;++j){
-				if(goal[i][j]!=curr[i][j])
+				if(goal[i][j]!=curr[i][j] && curr[i][j])
 					d++;
 				//trace(curr[i][j],grid[i][j],goal[i][j],d);
 			}
@@ -79,23 +65,25 @@ private:
 		return d;
 	}
 
-	seed newNode(int curr[][3], int m, int h[])
+	seed* newNode(int curr[][3], int m, int h[], seed* p)
 	{
 		int d = (!ManORHam)? manhattan(curr) : hamming(curr) ;
-		seed temp;
+		seed* temp = new seed;
 		for(int i=0;i<3;++i)
 			for(int j=0;j<3;++j)
-				temp.mat[i][j] = curr[i][j];
-		temp.seedhole[0] = h[0];
-		temp.seedhole[1] = h[1];
-		temp.cost = d;
-		temp.moves = m;
+				temp->mat[i][j] = curr[i][j];
+
+		temp->seedhole[0] = h[0];
+		temp->seedhole[1] = h[1];
+		temp->cost = d;
+		temp->moves = m;
+		temp->parent = p;
 
 		return temp;
 	}
 
 	// Insert a new node in heap and adjust nodes
-	void insert(int curr[3][3], int m)
+	void insert(int curr[3][3], int m, seed* p)
 	{
 		int i, j, currhole[2];
 
@@ -104,17 +92,18 @@ private:
 				if(!curr[i][j])
 					currhole[0]=i,currhole[1]=j;
 
-		heap.pb( newNode(curr,m,currhole) );
+		heap.pb( newNode(curr,m,currhole,p) );
 
 		i = heap.size()-1;
 
-		while(i && heap[(i-1)/2].cost + heap[(i-1)/2].moves > heap[i].cost + heap[i].moves)
+		while(i && heap[(i-1)/2]->cost + heap[(i-1)/2]->moves > heap[i]->cost + heap[i]->moves)
 		{
 			swap(heap[(i-1)/2], heap[i]);
 			i = (i-1)/2;
 		}
 
 		maxsize = max(maxsize, (int)heap.size());
+		//debug();
 	}
 
 	// Adjust the nodes according to properties of the min heap
@@ -124,9 +113,9 @@ private:
 		int r = 2*i+2;
 		int smallest = i;
 
-		if(l<heap.size() && heap[l].cost + heap[l].moves > heap[i].cost + heap[i].moves)
+		if(l<heap.size() && heap[l]->cost + heap[l]->moves < heap[i]->cost + heap[i]->moves)
 			smallest = l;
-		if(r<heap.size() && heap[r].cost + heap[r].moves > heap[smallest].cost + heap[smallest].moves)
+		if(r<heap.size() && heap[r]->cost + heap[r]->moves < heap[smallest]->cost + heap[smallest]->moves)
 			smallest = r;
 
 		if(smallest != i)
@@ -150,7 +139,7 @@ private:
 			return true;
 		}
 
-		seed root = heap[heap.size()-1];
+		heap[0]=heap[heap.size()-1];
 		heapify(0);
 		heap.erase(prev(heap.end()));
 		return true;
@@ -158,46 +147,46 @@ private:
 
 	void debug()
 	{
-		cout<<"******************\n";
+		cout<<"----- DEBUG -----\n";
 		for(int l=0;l<heap.size();++l)
 		{
 			for(int k=2;k>=0;--k){
 			/*for(int k=0;k<3;++k){*/
 				for(int p=0;p<3;++p)
-					cout<<heap[l].mat[p][k]<<" ";
+					cout<<heap[l]->mat[p][k]<<" ";
 				cout<<"\n";
 			}
 
-			cout<<heap[l].moves<<" "<<heap[l].cost;
+			cout<<heap[l]->moves<<" "<<heap[l]->cost;
 			cout<<"\n";
 		}
-		cout<<"******************\n";
+		cout<<"-----------------\n";
 	}
 
 public:
 
-	// Contains wrapper functions to match queue terminology
+	/* Contains wrapper functions to match queue terminology */
 
 	// Maximum size of the PQ reached ever
 	int maxsize;
 
 	// Enqueue
-	void push( int curr[3][3] , int m)
+	void push( int curr[3][3] , int m, seed* p)
 	{
-		insert(curr,m);
-		debug();
+		insert(curr,m,p);
+		//cout<<"PUSHED\n"; debug();
 	}
 
 	// Dequeue
 	bool pop()
 	{
 		bool res = deleteTop();
-		debug();
+		//cout<<"POPPED\n"; debug();
 		return (res) ? true : false;
 	}
 
 	// Return top
-	seed top()
+	seed* top()
 	{
 		if(heap.size()) return heap[0];
 	}
@@ -210,80 +199,81 @@ public:
 
 };
 
-void solve()
+// Returns true if the position is in the bounds
+int swappable( int x, int y )
 {
+	return (x >= 0 && x < 3 && y >= 0 && y < 3);
+}
+
+// Direction vectors
+int dx[] = { 1, 0, -1, 0 };
+int dy[] = { 0, -1, 0, 1 };
+
+
+// A* search algorithm or better-known as Best-First Search.
+void AStar()
+{
+	int i, j, k;
 	PriorityQueue pq;
 
-	int x[3][3] = 
+	int totalmoves = 0;
+	
+	/*int test[3][3] =
 	{
-		{7,6,3},
-		{8,5,2}, 
-		{0,4,1}
+		{7,5,1},
+		{8,6,2}, 
+		{4,0,3}
 	};
-	pq.push(x,1);
-	int x1[3][3] = 
+
+	memcpy(grid,test,sizeof grid);
+	hole[0]=2; hole[1]=1;*/
+
+	pq.push(grid,totalmoves,0);
+
+	while(!pq.isEmpty())
 	{
-		{7,6,3},
-		{8,5,2}, 
-		{0,4,1}
-	};
-	pq.push(x1,311);
+		seed* top = pq.top();
+		seed* par = top->parent;
+		pq.pop();
 
-	int y[3][3] = 
-	{
-		{7,6,1},
-		{8,5,2}, 
-		{0,4,3}
-	};
-	pq.push(y,1312);
+		//cerr<<"popped:\n"; for(j=2;j>=0;--j) { for(k=0;k<3;++k) cerr<<top->mat[k][j]<<" "; cerr<<"\n"; } trace(top->moves,top->cost); cerr<<"\n";
 
-	//debug();
-
-	pq.pop();
-	pq.pop();
-	pq.pop();
-	cout<< pq.isEmpty()<<"\n";
-	pq.pop();
-	cout<< pq.isEmpty()<<"\n";
-
-	//debug();
-
-	seed xx = pq.top();
-
-}
-int iii = 0;
-bool printflag = false;
-int p[3][3][3] =
-{
-	{
-	{7,6,3},
-	{8,5,2}, 
-	{0,4,1}
-	},
-
-	{
-	{7,6,3},
-	{8,5,2}, 
-	{0,4,1}
-	},
-
-	{
-	{7,6,1},
-	{8,5,2}, 
-	{0,4,3}
-	}
-
-};
-
-void printt()
-{
-	int j,k;
-
-	for(j=0;j<3;++j)
-	{
-		for(k=0;k<3;++k)
+		// Final position is reached
+		if(top->cost == 0)
 		{
-			grid[j][k]=p[iii][j][k];
+			final = top;
+			pushGrids(final);
+			printflag = true;
+			cerr<<"Maximum elements in queue at any state = " << pq.maxsize;
+			cerr<<"\nTotal moves used to solve the puzzle = " << totalmoves<<"\n";
+			return;
 		}
+
+		totalmoves++;
+
+		int topmat[3][3];
+		memcpy(topmat,top->mat,sizeof topmat);
+
+		// Enqueue all the seeds reacheable from the current seed
+		for(i=0;i<4;++i)
+		{
+			int h[2];
+			h[0] = top->seedhole[0];
+			h[1] = top->seedhole[1];
+			if(swappable(h[0]+dx[i],h[1]+dy[i]))
+			{
+				if(par && ( h[0]+dx[i]==par->seedhole[0] && h[1]+dy[i]==par->seedhole[1] ))
+					continue;
+
+				swap( topmat[h[0]][h[1]] , topmat[h[0]+dx[i]][h[1]+dy[i]] );
+
+				//cerr<<"pushed:\n"; for(j=2;j>=0;--j) { for(k=0;k<3;++k) cerr<<topmat[k][j]<<" "; cerr<<"\n"; } cerr<<"\n";
+				
+				pq.push(topmat, totalmoves, top );
+				swap( topmat[h[0]][h[1]] , topmat[h[0]+dx[i]][h[1]+dy[i]] );
+			}
+		}
+
 	}
+
 }
