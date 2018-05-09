@@ -1,5 +1,5 @@
 # Puzzle-8
-An implementation of the game Puzzle 8 and building an AI to solve it
+An implementation of the game Puzzle 8 and AI to solve it
 
 The AI of the program is built using the A* algorithm which uses Priority Queues and Heaps to implement. Uses OpenGL and GLUT framework. Make sure you have both the libraries installed before running.
 
