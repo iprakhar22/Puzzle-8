@@ -156,6 +156,11 @@ void printGrid()
 	for(i=0;i<3;++i)
 		for(j=0;j<3;++j)
 			grid[i][j] = curr->mat[i][j];
+
+	for(i=0;i<3;++i)
+		for(j=0;j<3;++j)
+			if(curr->mat[i][j] == 0)
+				hole[0]=i,hole[1]=j;
 }
 
 void pushGrids(seed* node)

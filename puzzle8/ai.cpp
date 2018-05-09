@@ -245,7 +245,7 @@ void AStar()
 			pushGrids(final);
 			printflag = true;
 			cerr<<"Maximum elements in queue at any state = " << pq.maxsize;
-			cerr<<"\nTotal moves used to solve the puzzle = " << totalmoves<<"\n";
+			cerr<<"\nTotal moves used to solve the puzzle = " << totalmoves<<"\n\n";
 			return;
 		}
 
@@ -254,7 +254,7 @@ void AStar()
 		int topmat[3][3];
 		memcpy(topmat,top->mat,sizeof topmat);
 
-		// Enqueue all the seeds reacheable from the current seed
+		// Enqueue all the seeds reachable from the current seed
 		for(i=0;i<4;++i)
 		{
 			int h[2];
